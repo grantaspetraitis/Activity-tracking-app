@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Verify = () => {
@@ -11,7 +12,13 @@ const Verify = () => {
     const verify = async () => {
         const response = await fetch(`http://localhost:5001/verify/${params.token}`)
         const json = await response.json();
-        setIsVerified(json.success)
+        if(json.success){
+            setIsVerified(true);
+            navigate('/login');
+        } else {
+            toast.error(json.error);
+        }
+       
     }
 
     useEffect(() => {

@@ -30,3 +30,142 @@
   top: 0;
   z-index: 99;
 }
+
+/* Register form */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+  
+}
+
+.form-element {
+  padding: 10px;
+}
+
+.input {
+  padding: 5px;
+  border-style: hidden hidden solid hidden;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.btn {
+  width: 100px;
+  border-style: hidden;
+  padding: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  background-color: #A668A7;
+}
+
+.btn:hover {
+  background-color: #7d4b7e;
+}
+
+/* Hero */
+
+.hero-rect {
+  margin-top: 300px;
+  margin-left: 200px;
+  /* height: 300px;
+  width: 500px; */
+  background: linear-gradient(130deg, #a668a7, rgba(237, 214, 255, 0.907));
+  box-shadow: -50px -30px rgba(215, 215, 215, 0.492);
+  display: flex;
+  justify-content: center;
+  grid-column: 1 / 1;
+  grid-row: 1 / 6;
+}
+
+.hero-paragraph {
+  color: white;
+  font-family: sans-serif;
+  width: 80%;
+  font-size: 2em;
+  text-align: center;
+  margin-top: 50px;
+}
+
+.form-container-home {
+  grid-column: 2 / 3;
+  grid-row: 4 / 8;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  grid-template-rows: repeat(10, 100px);
+}
+
+/* Spinner */
+
+@keyframes text-color {
+  0% {
+    color: rgba(106, 106, 106, 0.526)
+  }
+
+  50% {
+    color: rgba(106, 106, 106, 0.821)
+  }
+
+  100% {
+    color: rgba(106, 106, 106, 0.526)
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  overflow: hidden;
+  position: relative;
+  animation: text-color 2s ease-in-out alternate;
+}
+
+.spinner::before, .spinner::after {
+  content: '';
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  border-radius: 50%;
+  border: 15px solid transparent;
+  mix-blend-mode: overlay;
+  animation: rotate var(--duration) var(--timing) infinite;
+  pointer-events: none;
+}
+
+.spinner::before {
+  border-left-color: #A668A7;
+  --duration: 2s;
+  --timing: ease-in;
+}
+
+.spinner::after {
+  border-right-color:#924193;
+  --duration: 2.5s;
+  --timing: ease-out;
+}
+
+/* Activity form */
+
+.activity-form {
+  margin-top: 200px;
+}

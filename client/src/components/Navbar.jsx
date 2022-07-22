@@ -15,12 +15,15 @@ const Navbar = () => {
 
     return (
         <nav className="navbar-container">
-            <h1 style={{ color: "white", paddingLeft: 20, fontSize: "2em" }}>Debree</h1>
+            <h1 style={{ color: "white", paddingLeft: 20, fontSize: "2em" }}>Activity app</h1>
             <ul className="navbar">
                 {login ? (
                     <>
                         <li>
-                            <Link to="/activity">Your activities</Link>
+                            <Link to="/addactivity">Add new activity</Link>
+                        </li>
+                        <li>
+                            <Link to="/activities">My activities</Link>
                         </li>
                         <li>
                             <Link to="/profile">My profile</Link>

@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import ActivityAdder from './pages/ActivityAdder';
 import Activities from './pages/Activities';
 import Verify from './pages/Verify';
+import NewActivity from './pages/NewActivity';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path='/addactivity' element={<ActivityAdder />} />
           <Route path='/activities' element={<Activities />} />
           <Route path='/verify/:token' element={<Verify />} />
+          <Route path='/addnewactivity' element={<NewActivity />} />
         </Routes>
       </Router>
     </AppContextProvider>

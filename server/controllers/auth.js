@@ -40,20 +40,26 @@ exports.registerUser = async (req, res) => {
     })
 }
 
-exports.loginUser = (req, res) => {
+exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
-    pool.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
+    pool.query('SELECT user_id FROM users WHERE email = ?', [email], (err, result) => {
         if (err) throw err;
         if (result.length > 0) {
-            const user = result[0];
-            if (err) throw err;
+            const user_id = result[0].user_id;
+            pool.query('SELECT * FROM users WHERE user_id = ? AND isActive = ?', [user_id, 1], async (err, result2) => {
+                if (err) throw err;
+                if (result2.length > 0) {
+                    const user = result2[0];
+                    const hashedPass = user.password;
+                    const isPasswordCorrect = await bcrypt.compare(password, hashedPass);
+                    if (!isPasswordCorrect) return res.status(400).send({ error: 'Incorrect credentials' });
 
-            const hashedPass = user.password;
-            const isPasswordCorrect = await bcrypt.compare(password, hashedPass);
-            if (!isPasswordCorrect) return res.status(400).send({ error: 'Incorrect credentials' });
-
-            const token = jwt.sign({ user }, process.env.JWT_SECRET);
-            res.status(200).send({ token: token, username: user.username, id: user.user_id, role: user.role });
+                    const token = jwt.sign({ user }, process.env.JWT_SECRET);
+                    res.status(200).send({ token: token, username: user.username, id: user.user_id, role: user.role });
+                } else {
+                    res.status(400).send({ error: 'Please verify your email address' })
+                }
+            })
         } else {
             res.status(400).send({ error: 'User does not exist' })
         }
@@ -83,18 +89,25 @@ exports.loginUser = (req, res) => {
 exports.verifyUserEmail = async (req, res) => {
     const verifyToken = req.params.token;
     const currentDate = (new Date()).getTime();
-    pool.query('SELECT user_id, tokenExpiration FROM users WHERE verifyToken = ?', [verifyToken], (err, result) => {
-        if (err) throw err;
-        const user_id = result[0].user_id;
-        const expiration = (result[0].tokenExpiration).getTime();
-        console.log(expiration, currentDate)
-        if(expiration > currentDate){
-            pool.query('UPDATE users SET isActive = ? WHERE user_id = ?', [true, user_id], (err, result2) => {
-                if (err) throw err;
-                res.status(200).send({ success: true })
-            })
-        } else {
-            res.status(400).send({ error: 'Link expired' })
-        }
-    })
+    if (verifyToken !== 0) {
+        pool.query('SELECT user_id, tokenExpiration FROM users WHERE verifyToken = ?', [verifyToken], (err, result) => {
+            if (err) throw err;
+            if (result.length > 0) {
+                const user_id = result[0].user_id;
+                const expiration = (result[0].tokenExpiration).getTime();
+                if (expiration > currentDate) {
+                    pool.query('UPDATE users SET isActive = ?, verifyToken = ? WHERE user_id = ?', [true, user_id], (err, result2) => {
+                        if (err) throw err;
+                        res.status(200).send({ success: true })
+                    })
+                } else {
+                    res.status(400).send({ error: 'Link expired' });
+                }
+            } else {
+                res.status(401).send({ error: 'Invalid link' })
+            }
+        })
+    } else {
+        res.status(401).send({ error: 'Invalid link' });
+    }
 }

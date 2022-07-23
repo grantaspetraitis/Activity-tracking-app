@@ -28,9 +28,16 @@ const Navbar = () => {
                         <li>
                             <Link to="/profile">My profile</Link>
                         </li>
+                        {
+                            login.role === 'subscriber' &&
+                            <li>
+                                <Link to="/addnewactivity">Add custom activity</Link>
+                            </li>
+                        }
                         <li>
                             <span style={{ cursor: "pointer" }} onClick={logout}>Log out</span>
                         </li>
+                        
 
                     </>
 

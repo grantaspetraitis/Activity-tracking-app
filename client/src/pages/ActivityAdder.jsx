@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../Context";
 import Slider from '@mui/material/Slider'
+import ActivityCategory from "../components/ActivityCategory";
+import Activity from "../components/Activity";
 
 const ActivityAdder = () => {
 
@@ -17,15 +19,32 @@ const ActivityAdder = () => {
         activity_result: '',
         mood: ''
     })
-    const [categories, setCategories] = useState(null)
+    const [categories, setCategories] = useState(null);
+    const [activities, setActivities] = useState(null);
+    const [moodStep, setMoodStep] = useState(false);
+    const [category, setCategory] = useState(null);
 
     const { title, duration, result, mood } = formData;
 
-    const fetchActivities = async () => {
+    const fetchActivityCategories = async () => {
         const response = await fetch('/categories');
         const json = await response.json();
-        console.log(json)
         setCategories(json);
+    }
+
+    const fetchActivities = async (category) => {
+        const response = await fetch(`/activities/${category}`)
+        const json = await response.json();
+        setActivities(json)
+    }
+
+    const getCategory = (value) => {
+        setCategory(value);
+    }
+
+    const onClickNext2 = e => {
+        e.preventDefault();
+        setMoodStep(true);
     }
 
     const onChange = (e) => {
@@ -35,12 +54,15 @@ const ActivityAdder = () => {
         }))
     }
 
+    // const onSubmitCategory = async e => {
+    //     e.preventDefault();
+    //     console.log(e.target.title)
+    //     setCategory(e.target.title.value)
+    // } 
+
     const onSubmit = async (e) => {
         const activityData = {
             title: e.target.title.value,
-            duration: e.target.duration.value,
-            result: e.target.result.value,
-            mood: e.target.mood.value
         }
 
         const response = await fetch('/addactivity', {
@@ -53,7 +75,7 @@ const ActivityAdder = () => {
         })
 
         const json = await response.json();
-        if(response.ok) {
+        if (response.ok) {
             toast.success('Added activity successfully!')
             navigate('/activities')
         } else {
@@ -62,26 +84,59 @@ const ActivityAdder = () => {
     }
 
     useEffect(() => {
-        fetchActivities();
+        fetchActivityCategories();
+        // fetchActivities(category);
     }, [])
 
 
     return (
-        <form className="activity-form" onSubmit={onSubmit}>
-            <div className="form-element">
-                {/* <input required className="input" type="text" value={title} placeholder="Enter activity name" onChange={onChange} name="title"></input> */}
-                <select onChange={onChange}>
-                    {categories && categories.map(category => <option value={category.activity_category}>{category.activity_category}</option>)}
-                </select>
-                <Slider 
-                    size="small"
-                    dafaultValue={70}
-                    aria-label="Small"
-                    valueLabelDisplay="auto"
-                />
-            </div>
-        </form>
+        <>
+
+            <h1 className="header">Select the category of your activity</h1>
+            <form className="activity-form">
+                <div className="form-element">
+                    {categories && categories.map((category, i) => <ActivityCategory key={i} id={category.category_id} fetchActivities={fetchActivities} getCategory={getCategory} data={category.category_name}></ActivityCategory>)}
+                </div>
+                {/* <div className="form-element">
+                    <button className="btn">Next</button>
+                </div> */}
+            </form>
+            {category &&
+                <>
+                    <h1 className="header2">Select activity</h1>
+                    <form className="activity-form">
+                        <div className="form-element">
+                            {activities && activities.map((activity, i) => <Activity key={i} data={activity.activity_title}></Activity>)}
+                        </div>
+                        <div className="form-element">
+                            <button className="btn" onClick={onClickNext2}>Next</button>
+                        </div>
+                    </form>
+                </>
+            }
+            {moodStep &&
+                <>
+                    <h1 className="header2">Result and mood</h1>
+                    <form className="activity-form" onSubmit={onSubmit}>
+                        <div className="form-element">
+                            <input type="number" onChange={onChange} name={duration} className="input" placeholder="Activity duration in minutes"></input>
+                        </div>
+                        <div className="form-element">
+                            <label>Mood</label>
+                            <Slider
+                                aria-label="Small"
+                                valueLabelDisplay="auto"
+                                color="secondary"
+                                style={{ width: 200 }}
+                            />
+                        </div>
+
+                        <button className="btn">Submit</button>
+                    </form>
+                </>
+            }
+        </>
     );
 }
- 
+
 export default ActivityAdder;

@@ -10,7 +10,7 @@ const Verify = () => {
 
     const params = useParams();
     const verify = async () => {
-        const response = await fetch(`http://localhost:5001/verify/${params.token}`)
+        const response = await fetch(`/verify/${params.token}`)
         const json = await response.json();
         if(json.success){
             setIsVerified(true);
@@ -18,14 +18,11 @@ const Verify = () => {
         } else {
             toast.error(json.error);
         }
-       
     }
 
     useEffect(() => {
         verify();
     }, [])
-
-    console.log(isVerified)
 
     return (
         <>
